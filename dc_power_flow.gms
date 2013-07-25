@@ -1,32 +1,33 @@
 sets
-  bid /bid1, bid2, bid3/
-  offer /offer1, offer2, offer3, offer4, offer5, offer6/;
+  bid /bid_1*bid_3/
+  offer /offer_1*offer_6/;
+
 parameters
   bid_quantity(bid)
-  / bid1    70
-    bid2    60
-    bid3   150/
+  / bid_1    70
+    bid_2    60
+    bid_3   150/
 
   bid_price(bid) /
-    bid1 200
-    bid2 77
-    bid3 500/
+    bid_1 200
+    bid_2 77
+    bid_3 500/
 
   offer_quantity(offer) /
-    offer1 100
-    offer2 100
-    offer3 50
-    offer4 50
-    offer5 10
-    offer6 10/
+    offer_1 100
+    offer_2 100
+    offer_3 50
+    offer_4 50
+    offer_5 10
+    offer_6 10/
 
   offer_price(offer) /
-    offer1 55
-    offer2 75
-    offer3 40
-    offer4 70
-    offer5 35
-    offer6 80/;
+    offer_1 55
+    offer_2 75
+    offer_3 40
+    offer_4 70
+    offer_5 35
+    offer_6 80/;
 
 variables
   scheduled_bid(bid)
