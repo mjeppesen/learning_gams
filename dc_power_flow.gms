@@ -1,60 +1,86 @@
 sets
-  bid /bid1, bid2, bid3/
-  offer /offer1, offer2, offer3, offer4, offer5, offer6/;
+  bids /bid_1/
+  offers /offer_1, offer_2, offer_3/
+  nodes /node_1, node_2/
+  lines /line_1/;
+
+alias (nodes, nodes_from), (nodes, nodes_to);
+
 parameters
-  bid_quantity(bid)
-  / bid1    70
-    bid2    60
-    bid3   150/
+  bid_quantity(bids) /bid_1 100/
 
-  bid_price(bid) /
-    bid1 200
-    bid2 77
-    bid3 500/
+  bid_price(bids) /bid_1 200/
 
-  offer_quantity(offer) /
-    offer1 100
-    offer2 100
-    offer3 50
-    offer4 50
-    offer5 10
-    offer6 10/
+  offer_quantity(offers) /
+    offer_1 10
+    offer_2 70
+    offer_3 80/
 
-  offer_price(offer) /
-    offer1 55
-    offer2 75
-    offer3 40
-    offer4 70
-    offer5 35
-    offer6 80/;
+  offer_price(offers) /
+    offer_1 15
+    offer_2 75
+    offer_3 30/
+
+  line_capacity(lines) /line_1 50/;
+
+* subsets
+sets
+  bids_nodes(bids, nodes) /
+    bid_1.node_1 /
+
+  offers_nodes(offers, nodes) /
+    offer_1.node_1
+    offer_2.node_1
+    offer_3.node_2 /
+
+  lines_nodes(lines, nodes_from, nodes_to) /
+    line_1.node_1.node_2 /;
 
 variables
-  scheduled_bid(bid)
-  scheduled_offer(offer)
+  scheduled_bids(bids)
+  scheduled_offers(offers)
+  flows(lines)
+  nodal_flow(nodes)
   z;
 
 positive variables
-  scheduled_bid
-  scheduled_offer;
+  scheduled_bids
+  scheduled_offers;
 
 equations
   objective
-  max_bid(bid)
-  max_offer(offer)
+  max_bid(bids)
+  max_offer(offers)
+  max_flow(lines)
+  min_flow(lines)
+  node_flow_sum(nodes)
+  nodal_balance(nodes)
   conservation_of_energy;
 
-objective.. z =e= sum(bid, bid_price(bid) * scheduled_bid(bid)) - sum(offer, offer_price(offer) * scheduled_offer(offer));
+objective..  z =e= sum(bids, bid_price(bids) * scheduled_bids(bids)) - sum(offers, offer_price(offers) * scheduled_offers(offers));
 
-max_bid(bid).. scheduled_bid(bid) =l= bid_quantity(bid);
+max_bid(bids)..  scheduled_bids(bids) =l= bid_quantity(bids);
 
-max_offer(offer).. scheduled_offer(offer) =l= offer_quantity(offer);
+max_offer(offers)..  scheduled_offers(offers) =l= offer_quantity(offers);
 
-conservation_of_energy.. sum(bid, scheduled_bid(bid)) =e= sum(offer,scheduled_offer(offer))
+max_flow(lines)..  flows(lines) =l= line_capacity(lines);
+
+min_flow(lines)..  flows(lines) =g= -1 * line_capacity(lines);
+
+node_flow_sum(nodes)..  nodal_flow(nodes) =e= sum(lines_nodes(lines, nodes_from, nodes), flows(lines)) -
+  sum(lines_nodes(lines, nodes, nodes_to), flows(lines));
+
+nodal_balance(nodes)..  sum(offers_nodes(offers, nodes), scheduled_offers(offers))
+  - sum(bids_nodes(bids, nodes), scheduled_bids(bids)) =e=
+    nodal_flow(nodes);
+
+conservation_of_energy..  sum(bids, scheduled_bids(bids)) =e= sum(offers, scheduled_offers(offers));
 
 model thing /all/;
 solve thing using lp maximizing z;
 
-display scheduled_bid.l, scheduled_offer.l;
+display scheduled_bids.l, scheduled_offers.l;
+display flows.l
 
 
 
