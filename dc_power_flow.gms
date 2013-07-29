@@ -1,3 +1,5 @@
+* A simple 2 node, 1 line energy market type transport model to practice with gams
+*
 sets
   bids /bid_1/
   offers /offer_1, offer_2, offer_3/
@@ -57,30 +59,40 @@ equations
   nodal_balance(nodes)
   conservation_of_energy;
 
-objective..  z =e= sum(bids, bid_price(bids) * scheduled_bids(bids)) - sum(offers, offer_price(offers) * scheduled_offers(offers));
+objective..
+  z =e= sum(bids, bid_price(bids) * scheduled_bids(bids))
+    - sum(offers, offer_price(offers) * scheduled_offers(offers));
 
-max_bid(bids)..  scheduled_bids(bids) =l= bid_quantity(bids);
+max_bid(bids)..
+  scheduled_bids(bids) =l= bid_quantity(bids);
 
-max_offer(offers)..  scheduled_offers(offers) =l= offer_quantity(offers);
+max_offer(offers)..
+  scheduled_offers(offers) =l= offer_quantity(offers);
 
-max_flow(lines)..  flows(lines) =l= line_capacity(lines);
+max_flow(lines)..
+  flows(lines) =l= line_capacity(lines);
 
-min_flow(lines)..  flows(lines) =g= -1 * line_capacity(lines);
+min_flow(lines)..
+  flows(lines) =g= -1 * line_capacity(lines);
 
-node_flow_sum(nodes)..  nodal_flow(nodes) =e= sum(lines_nodes(lines, nodes_from, nodes), flows(lines)) -
+node_flow_sum(nodes)..
+  nodal_flow(nodes) =e= sum(lines_nodes(lines, nodes_from, nodes), flows(lines)) -
   sum(lines_nodes(lines, nodes, nodes_to), flows(lines));
 
-nodal_balance(nodes)..  sum(offers_nodes(offers, nodes), scheduled_offers(offers))
+nodal_balance(nodes)..
+  sum(offers_nodes(offers, nodes), scheduled_offers(offers))
   - sum(bids_nodes(bids, nodes), scheduled_bids(bids)) =e=
     nodal_flow(nodes);
 
-conservation_of_energy..  sum(bids, scheduled_bids(bids)) =e= sum(offers, scheduled_offers(offers));
+conservation_of_energy..
+  sum(bids, scheduled_bids(bids)) =e= sum(offers, scheduled_offers(offers));
 
 model thing /all/;
 solve thing using lp maximizing z;
 
 display scheduled_bids.l, scheduled_offers.l;
 display flows.l
+display nodal_balance.m
 
 
 
