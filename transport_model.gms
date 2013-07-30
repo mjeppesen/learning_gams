@@ -11,13 +11,11 @@ alias (nodes, nodes_from), (nodes, nodes_to);
 parameters
   bid_quantity(bids) /bid_1 100/
 
-  bid_price(bids) /bid_1 200/
+  bid_price(bids) /bid_1 200/;
 
-  offer_quantity(offers) /
-    offer_1 10
-    offer_2 70
-    offer_3 80/
+$include offer_quantity
 
+parameters
   offer_price(offers) /
     offer_1 15
     offer_2 75
